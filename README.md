@@ -20,6 +20,10 @@ My personal docker setup includes packages I often use, including the zsh shell.
 docker build --rm -f Dockerfile -t devdock:snapshot-001 .
 ```
 
+## Credentials 
+
+The credentials are available in the Dockerfile. Change the password in the container and rebuild the container if you plan to use it for more than exploring.  Using the `passwd` command will not persist the password change.
+
 ### Running 
 
 #### Running ephemerally
@@ -38,22 +42,18 @@ This will persist the data to the specified volume.  The following example will 
 docker container run -it -v $(pwd)/devuser:/home/devuser devdock:snapshot-001 /bin/zsh
 ```
 
-#### Tag 
-
-```
-docker tag devdock:snapshot-001 schin8/devdock:snapshot-001
-
-```
 
 ### Push the image to the docker hub repository.
-
 ```
 docker login -u <username>
 ```
 
+#### Tag 
+```
+docker tag devdock:snapshot-001 schin8/devdock:snapshot-001
+```
+
 Since we're using both arm and x86 images[^2]
-
-
 
 make sure docker desktop has the experimental features enabled.  Create a new builder instance; the default builder only supports a single platform.
 
@@ -61,14 +61,21 @@ make sure docker desktop has the experimental features enabled.  Create a new bu
 docker buildx create --use
 ```
 
-
-
 ```
 docker buildx build \
 --push \
 --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
 --tag schin8/devdock:snapshot-001 .
 ```
+
+The container is available on hub.docker.com at
+
+```
+https://hub.docker.com/r/schin8/devdock
+```
+
+
+
 
 ---
 
