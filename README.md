@@ -16,13 +16,24 @@ My personal docker setup includes packages I often use, including the zsh shell.
 
 ### Building
 
-```
-docker build --rm -f Dockerfile -t devdock:snapshot-001 .
-```
+The Dockerfile takes 2 parameters
 
-## Credentials 
+| Parameter | Default Value | Use                                  |
+| --------- | ------------- | ------------------------------------ |
+| user      | pi            | Create a user and home for the user. |
+| password  | raspberry     | password for use                     |
 
-The credentials are available in the Dockerfile. Change the password in the container and rebuild the container if you plan to use it for more than exploring.  Using the `passwd` command will not persist the password change.
+
+
+```
+# User default user password
+docker build --rm -f Dockerfile -t devdock:snapshot-002 .
+
+# Or specify a user
+docker build --rm -f Dockerfile -t devdock:snapshot-002 \
+--build-arg user=scott \
+--build-arg password=tiger .
+```
 
 ### Running 
 
@@ -31,7 +42,9 @@ The credentials are available in the Dockerfile. Change the password in the cont
 Nothing gets saved. 
 
 ```
-docker run -it devdock:snapshot-001 /bin/zsh
+user=scott docker run -it devdock:snapshot-002 
+# Specify shell to use (must exist on build), zsh is default
+user=scott docker run -it devdock:snapshot-002 /bin/zsh
 ```
 
 #### Running with persisted data
@@ -39,7 +52,8 @@ docker run -it devdock:snapshot-001 /bin/zsh
 This will persist the data to the specified volume.  The following example will create a folder "devuser" in the current directory if it doesn't exist and map to /home/devuser in the container.
 
 ```
-docker container run -it -v $(pwd)/devuser:/home/devuser devdock:snapshot-001 /bin/zsh
+user=scott docker run -it -v $(pwd)/${user}:/home/${user} devdock:snapshot-002
+
 ```
 
 
@@ -50,7 +64,7 @@ docker login -u <username>
 
 #### Tag 
 ```
-docker tag devdock:snapshot-001 schin8/devdock:snapshot-001
+docker tag devdock:snapshot-002 schin8/devdock:snapshot-002
 ```
 
 Since we're using both arm and x86 images[^2]
@@ -65,7 +79,7 @@ docker buildx create --use
 docker buildx build \
 --push \
 --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
---tag schin8/devdock:snapshot-001 .
+--tag schin8/devdock:snapshot-002 .
 ```
 
 The container is available on hub.docker.com at
